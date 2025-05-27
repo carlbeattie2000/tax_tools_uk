@@ -1,8 +1,9 @@
 package router
 
-import (
-	"tax_calculator/engine/internal/logger"
+// TODO: Need to be able to pass arguments to routes
+// TODO: Router needs to support keyboard input, by just sending a route name keyboardpressed.[keys].hookToRoute(path)
 
+import (
 	"github.com/rivo/tview"
 )
 
@@ -42,7 +43,6 @@ func (uirouter *UIRouter) RegisterPath(path string, page *tview.Flex) {
 }
 
 func (uirouter *UIRouter) Navigate(path string) {
-	logger.GetLogger().Printf("navigating to path: %s\n", path)
 	route, ok := uirouter.paths[path]
 
 	if !ok {
@@ -52,12 +52,11 @@ func (uirouter *UIRouter) Navigate(path string) {
 
 	uirouter.routerHistory.Navigate(path)
 	uirouter.app.SetRoot(route.page, true)
-	logger.GetLogger().Println("navigated")
 }
 
 func (uirouter *UIRouter) Back() {
 	uirouter.routerHistory.Back()
-	path := uirouter.routerHistory.currentPageNode.page
+	path := uirouter.routerHistory.location.location
 	route, ok := uirouter.paths[path]
 
 	if !ok {
@@ -70,7 +69,7 @@ func (uirouter *UIRouter) Back() {
 
 func (uirouter *UIRouter) Forward() {
 	uirouter.routerHistory.Forward()
-	path := uirouter.routerHistory.currentPageNode.page
+	path := uirouter.routerHistory.location.location
 	route, ok := uirouter.paths[path]
 
 	if !ok {
@@ -79,4 +78,8 @@ func (uirouter *UIRouter) Forward() {
 	}
 
 	uirouter.app.SetRoot(route.page, true)
+}
+
+func (uirouter *UIRouter) GetRouterListener() *RouterListener {
+	return uirouter.routerHistory.listener
 }

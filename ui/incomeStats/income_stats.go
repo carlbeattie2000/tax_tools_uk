@@ -3,7 +3,6 @@ package incomestats
 import (
 	"fmt"
 	"strconv"
-	"tax_calculator/engine/internal/logger"
 	utilmath32 "tax_calculator/engine/internal/utils/util_math32"
 	taxliability "tax_calculator/engine/internal/valueobjects/tax_liability"
 	"tax_calculator/engine/ui/router"
@@ -103,7 +102,6 @@ func GetLayout(appRouter *router.UIRouter) *tview.Flex {
 	}).SetFieldBackgroundColor(000).SetButtonBackgroundColor(000)
 
 	form.AddButton("back", func() {
-		logger.GetLogger().Println("before income_stats navigate")
 		appRouter.Navigate("well")
 	})
 

@@ -1,25 +1,55 @@
 package router
 
-type pageNode struct {
-	page     string
-	next     *pageNode
-	previous *pageNode
+type locationNode struct {
+	location string
+	next     *locationNode
+	previous *locationNode
 }
 
-func newPageNode(page string) *pageNode {
-	return &pageNode{page: page}
+func newLocationNode(location string) *locationNode {
+	return &locationNode{location: location}
+}
+
+type RouterUpdate struct {
+	Action   string
+	Location string
+	Delta    int
+}
+
+func newRouterUpdate(action string, location string, delta int) *RouterUpdate {
+	return &RouterUpdate{action, location, delta}
+}
+
+type RouterListener struct {
+	subscribers []func(update *RouterUpdate)
+}
+
+func (listener *RouterListener) Subscribe(subscriberFunc func(update *RouterUpdate)) {
+	listener.subscribers = append(listener.subscribers, subscriberFunc)
+}
+
+func (listener *RouterListener) update(update *RouterUpdate) {
+	for _, subscriber := range listener.subscribers {
+		subscriber(update)
+	}
+}
+
+func newRouterListener() *RouterListener {
+	return &RouterListener{}
 }
 
 type Router struct {
-	currentPageNode *pageNode
-	head            *pageNode
-	size            int
-	maxSize         int
+	location *locationNode
+	head     *locationNode
+	size     int
+	maxSize  int
+	listener *RouterListener
 }
 
 func newRouter(maxSize int) *Router {
 	return &Router{
-		maxSize: maxSize,
+		maxSize:  maxSize,
+		listener: newRouterListener(),
 	}
 }
 
@@ -37,12 +67,13 @@ func (router *Router) trimHead(amount int) {
 	}
 }
 
-func (router *Router) Navigate(page string) {
-	pNode := newPageNode(page)
-	if router.currentPageNode == nil {
-		router.currentPageNode = pNode
+func (router *Router) Navigate(location string) {
+	pNode := newLocationNode(location)
+	if router.location == nil {
+		router.location = pNode
 		router.head = pNode
 		router.size = 1
+		router.listener.update(newRouterUpdate("push", location, 0))
 		return
 	}
 
@@ -52,29 +83,36 @@ func (router *Router) Navigate(page string) {
 		router.size++
 	}
 
-	pNode.previous = router.currentPageNode
-	router.currentPageNode.next = pNode
-	router.currentPageNode = router.currentPageNode.next
+	pNode.previous = router.location
+	router.location.next = pNode
+	router.location = router.location.next
+	router.listener.update(newRouterUpdate("push", location, 0))
 }
 
 func (router *Router) Forward() {
-	if router.currentPageNode == nil || router.currentPageNode.next == nil {
+	if router.location == nil || router.location.next == nil {
 		return
 	}
 
-	router.currentPageNode = router.currentPageNode.next
+	router.location = router.location.next
+	router.listener.update(newRouterUpdate("jump", router.location.next.location, 1))
 }
 
 func (router *Router) Back() {
-	if router.currentPageNode == nil || router.currentPageNode.previous == nil {
+	if router.location == nil || router.location.previous == nil {
 		return
 	}
 
-	router.currentPageNode = router.currentPageNode.previous
+	router.location = router.location.previous
+	router.listener.update(newRouterUpdate("pop", router.location.previous.location, -1))
 }
 
 func (router *Router) Clear() {
-	router.currentPageNode = nil
+	router.location = nil
 	router.head = nil
 	router.size = 0
+}
+
+func (router *Router) GetRouterListener() *RouterListener {
+	return router.listener
 }
