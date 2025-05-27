@@ -20,11 +20,11 @@ func main() {
 	app := tview.NewApplication()
 	router := router.NewUIRouter(app)
 
-	router.RegisterIndex(mainmenu.GetLayout(router))
-	router.RegisterPath("income_stats", incomestats.GetLayout(router))
-	router.RegisterPath("not_found", notfound.GetLayout(router))
+	router.RegisterIndex(mainmenu.GetLayout)
+	router.RegisterPath("income_stats", incomestats.GetLayout)
+	router.RegisterPath("not_found", notfound.GetLayout)
 
-	router.Navigate("index")
+	router.Navigate("index", nil)
 
 	app.Run()
 }

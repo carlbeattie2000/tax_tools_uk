@@ -33,7 +33,7 @@ func SetTaxStat(income float32, scan *TaxStats) {
 // Configurable tax year
 // Deployable as a service so you can communicate via API (Ideal when you accept multiple small payments)
 
-func GetLayout(appRouter *router.UIRouter) *tview.Flex {
+func GetLayout(appRouter *router.UIRouter, _ any) *tview.Flex {
 	income1 := float32(0)
 	income2 := float32(0)
 	stat1 := TaxStats{}
@@ -102,7 +102,7 @@ func GetLayout(appRouter *router.UIRouter) *tview.Flex {
 	}).SetFieldBackgroundColor(000).SetButtonBackgroundColor(000)
 
 	form.AddButton("back", func() {
-		appRouter.Navigate("well")
+		appRouter.Back()
 	})
 
 	layout := tview.NewFlex().

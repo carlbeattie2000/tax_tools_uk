@@ -6,11 +6,11 @@ import (
 	"github.com/rivo/tview"
 )
 
-func GetLayout(router *router.UIRouter) *tview.Flex {
+func GetLayout(router *router.UIRouter, _ any) *tview.Flex {
 	layout := tview.NewFlex()
 
 	menuForm := tview.NewForm().AddButton("Income Stats", func() {
-		router.Navigate("income_stats")
+		router.Navigate("income_stats", nil)
 	})
 
 	layout.AddItem(menuForm, 0, 1, true)

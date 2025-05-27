@@ -9,10 +9,10 @@ import (
 
 type Route struct {
 	path string
-	page *tview.Flex
+	page func(router *UIRouter, args any) *tview.Flex
 }
 
-func newRoute(path string, page *tview.Flex) *Route {
+func newRoute(path string, page func(router *UIRouter, args any) *tview.Flex) *Route {
 	return &Route{path, page}
 }
 
@@ -34,24 +34,27 @@ func NewUIRouter(app *tview.Application) *UIRouter {
 	return uiRouter
 }
 
-func (uirouter *UIRouter) RegisterIndex(page *tview.Flex) {
+func (uirouter *UIRouter) RegisterIndex(page func(router *UIRouter, args any) *tview.Flex) {
 	uirouter.paths["index"] = newRoute("index", page)
 }
 
-func (uirouter *UIRouter) RegisterPath(path string, page *tview.Flex) {
+func (uirouter *UIRouter) RegisterPath(
+	path string,
+	page func(router *UIRouter, args any) *tview.Flex,
+) {
 	uirouter.paths[path] = newRoute(path, page)
 }
 
-func (uirouter *UIRouter) Navigate(path string) {
+func (uirouter *UIRouter) Navigate(path string, args any) {
 	route, ok := uirouter.paths[path]
 
 	if !ok {
-		uirouter.Navigate("not_found")
+		uirouter.Navigate("not_found", "well, this is awkward")
 		return
 	}
 
 	uirouter.routerHistory.Navigate(path)
-	uirouter.app.SetRoot(route.page, true)
+	uirouter.app.SetRoot(route.page(uirouter, args), true)
 }
 
 func (uirouter *UIRouter) Back() {
@@ -60,11 +63,11 @@ func (uirouter *UIRouter) Back() {
 	route, ok := uirouter.paths[path]
 
 	if !ok {
-		uirouter.Navigate("not_found")
+		uirouter.Navigate("not_found", nil)
 		return
 	}
 
-	uirouter.app.SetRoot(route.page, true)
+	uirouter.app.SetRoot(route.page(uirouter, nil), true)
 }
 
 func (uirouter *UIRouter) Forward() {
@@ -73,11 +76,11 @@ func (uirouter *UIRouter) Forward() {
 	route, ok := uirouter.paths[path]
 
 	if !ok {
-		uirouter.Navigate("not_found")
+		uirouter.Navigate("not_found", nil)
 		return
 	}
 
-	uirouter.app.SetRoot(route.page, true)
+	uirouter.app.SetRoot(route.page(uirouter, nil), true)
 }
 
 func (uirouter *UIRouter) GetRouterListener() *RouterListener {
