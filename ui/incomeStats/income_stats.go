@@ -3,6 +3,7 @@ package incomestats
 import (
 	"fmt"
 	"strconv"
+	"tax_calculator/engine/internal/logger"
 	utilmath32 "tax_calculator/engine/internal/utils/util_math32"
 	taxliability "tax_calculator/engine/internal/valueobjects/tax_liability"
 	"tax_calculator/engine/ui/router"
@@ -33,7 +34,7 @@ func SetTaxStat(income float32, scan *TaxStats) {
 // Configurable tax year
 // Deployable as a service so you can communicate via API (Ideal when you accept multiple small payments)
 
-func GetLayout(router *router.UIRouter) *tview.Flex {
+func GetLayout(appRouter *router.UIRouter) *tview.Flex {
 	income1 := float32(0)
 	income2 := float32(0)
 	stat1 := TaxStats{}
@@ -102,7 +103,8 @@ func GetLayout(router *router.UIRouter) *tview.Flex {
 	}).SetFieldBackgroundColor(000).SetButtonBackgroundColor(000)
 
 	form.AddButton("back", func() {
-		router.Back()
+		logger.GetLogger().Println("before income_stats navigate")
+		appRouter.Navigate("well")
 	})
 
 	layout := tview.NewFlex().

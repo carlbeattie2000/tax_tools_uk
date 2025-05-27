@@ -1,6 +1,8 @@
 package router
 
 import (
+	"tax_calculator/engine/internal/logger"
+
 	"github.com/rivo/tview"
 )
 
@@ -40,15 +42,17 @@ func (uirouter *UIRouter) RegisterPath(path string, page *tview.Flex) {
 }
 
 func (uirouter *UIRouter) Navigate(path string) {
+	logger.GetLogger().Printf("navigating to path: %s\n", path)
 	route, ok := uirouter.paths[path]
 
 	if !ok {
-		// TODO: Support error / fallback pages
+		uirouter.Navigate("not_found")
 		return
 	}
 
 	uirouter.routerHistory.Navigate(path)
 	uirouter.app.SetRoot(route.page, true)
+	logger.GetLogger().Println("navigated")
 }
 
 func (uirouter *UIRouter) Back() {
@@ -57,6 +61,7 @@ func (uirouter *UIRouter) Back() {
 	route, ok := uirouter.paths[path]
 
 	if !ok {
+		uirouter.Navigate("not_found")
 		return
 	}
 
@@ -69,6 +74,7 @@ func (uirouter *UIRouter) Forward() {
 	route, ok := uirouter.paths[path]
 
 	if !ok {
+		uirouter.Navigate("not_found")
 		return
 	}
 
