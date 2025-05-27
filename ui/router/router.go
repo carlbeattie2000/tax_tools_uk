@@ -10,13 +10,20 @@ func newLocationNode(location string) *locationNode {
 	return &locationNode{location: location}
 }
 
+type Action string
+
+const (
+	POP  = "POP"
+	PUSH = "PUSH"
+)
+
 type RouterUpdate struct {
-	Action   string
+	Action   Action
 	Location string
 	Delta    int
 }
 
-func newRouterUpdate(action string, location string, delta int) *RouterUpdate {
+func newRouterUpdate(action Action, location string, delta int) *RouterUpdate {
 	return &RouterUpdate{action, location, delta}
 }
 
@@ -73,7 +80,7 @@ func (router *Router) Navigate(location string) {
 		router.location = pNode
 		router.head = pNode
 		router.size = 1
-		router.listener.update(newRouterUpdate("push", location, 0))
+		router.listener.update(newRouterUpdate(PUSH, location, 0))
 		return
 	}
 
@@ -86,7 +93,7 @@ func (router *Router) Navigate(location string) {
 	pNode.previous = router.location
 	router.location.next = pNode
 	router.location = router.location.next
-	router.listener.update(newRouterUpdate("push", location, 0))
+	router.listener.update(newRouterUpdate(PUSH, location, 0))
 }
 
 func (router *Router) Forward() {
@@ -95,7 +102,7 @@ func (router *Router) Forward() {
 	}
 
 	router.location = router.location.next
-	router.listener.update(newRouterUpdate("jump", router.location.next.location, 1))
+	router.listener.update(newRouterUpdate(POP, router.location.next.location, 1))
 }
 
 func (router *Router) Back() {
@@ -104,7 +111,7 @@ func (router *Router) Back() {
 	}
 
 	router.location = router.location.previous
-	router.listener.update(newRouterUpdate("pop", router.location.previous.location, -1))
+	router.listener.update(newRouterUpdate(POP, router.location.previous.location, -1))
 }
 
 func (router *Router) Clear() {
