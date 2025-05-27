@@ -5,6 +5,7 @@ import (
 	"strconv"
 	utilmath32 "tax_calculator/engine/internal/utils/util_math32"
 	taxliability "tax_calculator/engine/internal/valueobjects/tax_liability"
+	"tax_calculator/engine/ui/router"
 
 	"github.com/chewxy/math32"
 	"github.com/rivo/tview"
@@ -32,7 +33,7 @@ func SetTaxStat(income float32, scan *TaxStats) {
 // Configurable tax year
 // Deployable as a service so you can communicate via API (Ideal when you accept multiple small payments)
 
-func GetLayout() *tview.Flex {
+func GetLayout(router *router.UIRouter) *tview.Flex {
 	income1 := float32(0)
 	income2 := float32(0)
 	stat1 := TaxStats{}
@@ -99,6 +100,10 @@ func GetLayout() *tview.Flex {
 
 		largerTaxIncreasePercentage.SetText(fmt.Sprintf("%f", increasePercentage) + "%")
 	}).SetFieldBackgroundColor(000).SetButtonBackgroundColor(000)
+
+	form.AddButton("back", func() {
+		router.Back()
+	})
 
 	layout := tview.NewFlex().
 		SetDirection(tview.FlexRow).
