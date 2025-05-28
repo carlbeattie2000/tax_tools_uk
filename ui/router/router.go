@@ -102,7 +102,7 @@ func (router *Router) forward() {
 	}
 
 	router.location = router.location.next
-	router.listener.update(newRouterUpdate(POP, router.location.next.location, 1))
+	router.listener.update(newRouterUpdate(POP, router.location.location, 1))
 }
 
 func (router *Router) back() {
@@ -111,7 +111,7 @@ func (router *Router) back() {
 	}
 
 	router.location = router.location.previous
-	router.listener.update(newRouterUpdate(POP, router.location.previous.location, -1))
+	router.listener.update(newRouterUpdate(POP, router.location.location, -1))
 }
 
 func (router *Router) clear() {
