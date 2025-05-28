@@ -3,8 +3,8 @@ package taxcalculator
 import (
 	"fmt"
 	"strconv"
-	nationalinsurance "tax_calculator/engine/internal/valueobjects/hmrc/national_insurance"
-	taxliability "tax_calculator/engine/internal/valueobjects/hmrc/tax_liability"
+	nationalinsurance "tax_calculator/engine/internal/valueobjects/hmrc_valueobjects/national_insurance"
+	taxliability "tax_calculator/engine/internal/valueobjects/hmrc_valueobjects/tax_liability"
 	"tax_calculator/engine/ui/router"
 
 	"github.com/rivo/tview"

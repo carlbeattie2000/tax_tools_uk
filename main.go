@@ -2,8 +2,8 @@ package main
 
 import (
 	"net/http"
-	notfound "tax_calculator/engine/ui/NotFound"
-	mainmenu "tax_calculator/engine/ui/mainMenu"
+	mainmenu "tax_calculator/engine/ui/main_menu"
+	notfound "tax_calculator/engine/ui/not_found"
 	"tax_calculator/engine/ui/router"
 	taxcalculator "tax_calculator/engine/ui/tax_calculator"
 
