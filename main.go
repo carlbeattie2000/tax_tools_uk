@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 	notfound "tax_calculator/engine/ui/NotFound"
-	incomestats "tax_calculator/engine/ui/incomeStats"
 	mainmenu "tax_calculator/engine/ui/mainMenu"
 	"tax_calculator/engine/ui/router"
+	taxcalculator "tax_calculator/engine/ui/tax_calculator"
 
 	"github.com/rivo/tview"
 
@@ -21,7 +21,7 @@ func main() {
 	router := router.NewUIRouter(app)
 
 	router.RegisterIndex(mainmenu.GetLayout)
-	router.RegisterPath("income_stats", incomestats.GetLayout)
+	router.RegisterPath("tax_calculator", taxcalculator.GetLayout)
 	router.RegisterPath("not_found", notfound.GetLayout)
 
 	router.Navigate("index", nil)
