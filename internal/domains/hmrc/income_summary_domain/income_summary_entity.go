@@ -1,8 +1,8 @@
 package incomesummarydomain
 
 import (
-	propertydomain "tax_calculator/engine/internal/domains/property_domain"
-	selfemploymentdomain "tax_calculator/engine/internal/domains/self_employment_domain"
+	propertydomain "tax_calculator/engine/internal/domains/hmrc/property_domain"
+	selfemploymentdomain "tax_calculator/engine/internal/domains/hmrc/self_employment_domain"
 )
 
 type IncomeSummaryEntity struct {

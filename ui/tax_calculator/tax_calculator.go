@@ -3,8 +3,8 @@ package taxcalculator
 import (
 	"fmt"
 	"strconv"
-	nationalinsurance "tax_calculator/engine/internal/valueobjects/national_insurance"
-	taxliability "tax_calculator/engine/internal/valueobjects/tax_liability"
+	nationalinsurance "tax_calculator/engine/internal/valueobjects/hmrc/national_insurance"
+	taxliability "tax_calculator/engine/internal/valueobjects/hmrc/tax_liability"
 	"tax_calculator/engine/ui/router"
 
 	"github.com/rivo/tview"
@@ -26,7 +26,7 @@ func GetLayout(appRouter *router.UIRouter, _ any) *tview.Flex {
 	totalDueDisplay := tview.NewTextView().
 		SetDynamicColors(true).
 		SetWrap(true).
-		SetLabel("Income tax and Class 4 National Insurance contributions due: ")
+		SetLabel("Income tax and Class 4 National Insurance contributions due:")
 
 	form := tview.NewForm()
 

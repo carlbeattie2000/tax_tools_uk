@@ -1,7 +1,7 @@
 package nationalinsurance_test
 
 import (
-	"tax_calculator/engine/internal/valueobjects/national_insurance"
+	"tax_calculator/engine/internal/valueobjects/hmrc/national_insurance"
 	"testing"
 )
 
