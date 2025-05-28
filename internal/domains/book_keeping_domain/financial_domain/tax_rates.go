@@ -1,4 +1,4 @@
-package financial
+package financialdomain
 
 type TaxRate struct {
 	name        string

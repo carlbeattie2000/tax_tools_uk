@@ -1,7 +1,7 @@
 package taxliability
 
 import (
-	personalallowancedomain "tax_calculator/engine/internal/domains/hmrc/personal_allowance_domain"
+	personalallowancedomain "tax_calculator/engine/internal/domains/hmrc_domain/personal_allowance_domain"
 	utilmath32 "tax_calculator/engine/internal/utils/util_math32"
 )
 

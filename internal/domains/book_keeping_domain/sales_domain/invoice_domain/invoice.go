@@ -1,18 +1,18 @@
-package invoice
+package invoicedomain
 
 import (
-	"tax_calculator/engine/internal/domains/financial"
-	"tax_calculator/engine/internal/domains/items"
+	financialdomain "tax_calculator/engine/internal/domains/book_keeping_domain/financial_domain"
+	itemsdomain "tax_calculator/engine/internal/domains/book_keeping_domain/items_domain"
 	salesvalueobjects "tax_calculator/engine/internal/valueobjects/sales_valueobjects"
 	"time"
 )
 
 type InvoiceItemEntry struct {
-	item        items.Item
+	item        itemsdomain.Item
 	description string
 	quantity    int
 	rate        float32
-	taxRate     *financial.TaxRate
+	taxRate     *financialdomain.TaxRate
 	discount    float32
 	total       float32
 }

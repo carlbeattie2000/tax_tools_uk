@@ -1,4 +1,4 @@
-package items
+package itemsdomain
 
 type Category struct {
 	id          int

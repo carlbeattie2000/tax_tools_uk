@@ -1,4 +1,4 @@
-package financial
+package financialdomain
 
 import financialvalueobjects "tax_calculator/engine/internal/valueobjects/financial_valueobjects"
 

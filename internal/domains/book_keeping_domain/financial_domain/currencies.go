@@ -1,4 +1,4 @@
-package financial
+package financialdomain
 
 type Currency struct {
 	id   int

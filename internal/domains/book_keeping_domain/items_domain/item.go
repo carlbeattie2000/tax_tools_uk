@@ -1,7 +1,7 @@
-package items
+package itemsdomain
 
 import (
-	"tax_calculator/engine/internal/domains/financial"
+	financial "tax_calculator/engine/internal/domains/book_keeping_domain/financial_domain"
 	"tax_calculator/engine/internal/valueobjects/items_valueobjects"
 )
 
