@@ -1,9 +1,7 @@
 package router
 
-// TODO: Need to be able to pass arguments to routes
-// TODO: Router needs to support keyboard input, by just sending a route name keyboardpressed.[keys].hookToRoute(path)
-
 import (
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -17,9 +15,10 @@ func newRoute(path string, page func(router *UIRouter, args any) *tview.Flex) *R
 }
 
 type UIRouter struct {
-	routerHistory Router
-	app           *tview.Application
-	paths         map[string]*Route
+	routerHistory  Router
+	keybindsRouter *KeybindsRouter
+	app            *tview.Application
+	paths          map[string]*Route
 }
 
 func NewUIRouter(app *tview.Application) *UIRouter {
@@ -30,6 +29,8 @@ func NewUIRouter(app *tview.Application) *UIRouter {
 		app:           app,
 		paths:         make(map[string]*Route),
 	}
+
+	uiRouter.keybindsRouter = newKeybindsRouter(app, uiRouter)
 
 	return uiRouter
 }
@@ -53,12 +54,12 @@ func (uirouter *UIRouter) Navigate(path string, args any) {
 		return
 	}
 
-	uirouter.routerHistory.Navigate(path)
+	uirouter.routerHistory.navigate(path)
 	uirouter.app.SetRoot(route.page(uirouter, args), true)
 }
 
 func (uirouter *UIRouter) Back() {
-	uirouter.routerHistory.Back()
+	uirouter.routerHistory.back()
 	path := uirouter.routerHistory.location.location
 	route, ok := uirouter.paths[path]
 
@@ -71,7 +72,7 @@ func (uirouter *UIRouter) Back() {
 }
 
 func (uirouter *UIRouter) Forward() {
-	uirouter.routerHistory.Forward()
+	uirouter.routerHistory.forward()
 	path := uirouter.routerHistory.location.location
 	route, ok := uirouter.paths[path]
 
@@ -83,6 +84,14 @@ func (uirouter *UIRouter) Forward() {
 	uirouter.app.SetRoot(route.page(uirouter, nil), true)
 }
 
-func (uirouter *UIRouter) GetRouterListener() *RouterListener {
-	return uirouter.routerHistory.listener
+func (uirouter *UIRouter) ListenerSubscribe(
+	subscriberFunc func(update *RouterUpdate),
+) {
+	uirouter.routerHistory.listener.subscribe(subscriberFunc)
+}
+
+func (uirouter *UIRouter) RegisterKeybind(key tcell.Key, location string) {
+	if _, ok := uirouter.paths[location]; ok {
+		uirouter.keybindsRouter.registerKey(key, location)
+	}
 }

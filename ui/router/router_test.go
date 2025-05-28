@@ -16,8 +16,8 @@ func TestRouter_trimHead(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			router := newRouter(tt.maxSize)
-			router.Navigate("example_page_1")
-			router.Navigate("example_page_2")
+			router.navigate("example_page_1")
+			router.navigate("example_page_2")
 			sizeBefore := router.size
 			router.trimHead(tt.amount)
 
@@ -54,7 +54,7 @@ func TestRouter_Navigate(t *testing.T) {
 			router := newRouter(tt.maxSize)
 
 			for _, page := range tt.pages {
-				router.Navigate(page)
+				router.navigate(page)
 			}
 
 			if router.location.location != tt.wantEndCurrentPage {
@@ -90,15 +90,15 @@ func TestRouter_Forward(t *testing.T) {
 			router := newRouter(tt.maxSize)
 
 			for _, page := range tt.pages {
-				router.Navigate(page)
+				router.navigate(page)
 			}
 
 			for range tt.back {
-				router.Back()
+				router.back()
 			}
 
 			for range tt.forward {
-				router.Forward()
+				router.forward()
 			}
 
 			if router.location.location != tt.wantPage {
@@ -131,11 +131,11 @@ func TestRouter_Back(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			router := newRouter(tt.maxSize)
 			for _, page := range tt.pages {
-				router.Navigate(page)
+				router.navigate(page)
 			}
 
 			for range tt.back {
-				router.Back()
+				router.back()
 			}
 
 			if router.location.location != tt.wantPage {
@@ -165,10 +165,10 @@ func TestRouter_Clear(t *testing.T) {
 			router := newRouter(tt.maxSize)
 
 			for _, page := range tt.pages {
-				router.Navigate(page)
+				router.navigate(page)
 			}
 
-			router.Clear()
+			router.clear()
 
 			if router.size != 0 {
 				t.Error("Router size > 0")

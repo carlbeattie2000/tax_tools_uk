@@ -1,13 +1,13 @@
 package router
 
-type locationNode struct {
+type LocationNode struct {
 	location string
-	next     *locationNode
-	previous *locationNode
+	next     *LocationNode
+	previous *LocationNode
 }
 
-func newLocationNode(location string) *locationNode {
-	return &locationNode{location: location}
+func newLocationNode(location string) *LocationNode {
+	return &LocationNode{location: location}
 }
 
 type Action string
@@ -31,7 +31,7 @@ type RouterListener struct {
 	subscribers []func(update *RouterUpdate)
 }
 
-func (listener *RouterListener) Subscribe(subscriberFunc func(update *RouterUpdate)) {
+func (listener *RouterListener) subscribe(subscriberFunc func(update *RouterUpdate)) {
 	listener.subscribers = append(listener.subscribers, subscriberFunc)
 }
 
@@ -46,8 +46,8 @@ func newRouterListener() *RouterListener {
 }
 
 type Router struct {
-	location *locationNode
-	head     *locationNode
+	location *LocationNode
+	head     *LocationNode
 	size     int
 	maxSize  int
 	listener *RouterListener
@@ -74,7 +74,7 @@ func (router *Router) trimHead(amount int) {
 	}
 }
 
-func (router *Router) Navigate(location string) {
+func (router *Router) navigate(location string) {
 	pNode := newLocationNode(location)
 	if router.location == nil {
 		router.location = pNode
@@ -96,7 +96,7 @@ func (router *Router) Navigate(location string) {
 	router.listener.update(newRouterUpdate(PUSH, location, 0))
 }
 
-func (router *Router) Forward() {
+func (router *Router) forward() {
 	if router.location == nil || router.location.next == nil {
 		return
 	}
@@ -105,7 +105,7 @@ func (router *Router) Forward() {
 	router.listener.update(newRouterUpdate(POP, router.location.next.location, 1))
 }
 
-func (router *Router) Back() {
+func (router *Router) back() {
 	if router.location == nil || router.location.previous == nil {
 		return
 	}
@@ -114,12 +114,8 @@ func (router *Router) Back() {
 	router.listener.update(newRouterUpdate(POP, router.location.previous.location, -1))
 }
 
-func (router *Router) Clear() {
+func (router *Router) clear() {
 	router.location = nil
 	router.head = nil
 	router.size = 0
-}
-
-func (router *Router) GetRouterListener() *RouterListener {
-	return router.listener
 }
