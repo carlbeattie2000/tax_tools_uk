@@ -1,6 +1,8 @@
 package router
 
 import (
+	"slices"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -37,6 +39,8 @@ func NewUIRouter(app *tview.Application) *UIRouter {
 
 func (uirouter *UIRouter) RegisterIndex(page func(router *UIRouter, args any) *tview.Flex) {
 	uirouter.paths["index"] = newRoute("index", page)
+
+	uirouter.Navigate("index", nil)
 }
 
 func (uirouter *UIRouter) RegisterPath(
@@ -94,4 +98,16 @@ func (uirouter *UIRouter) RegisterKeybind(key tcell.Key, location string) {
 	if _, ok := uirouter.paths[location]; ok {
 		uirouter.keybindsRouter.registerKey(key, location)
 	}
+}
+
+func (uirouter *UIRouter) GetUserPaths() []string {
+	nonUserPaths := []string{"index", "not_found"}
+	keys := make([]string, 0, len(uirouter.paths))
+	for k := range uirouter.paths {
+		if slices.Contains(nonUserPaths, k) {
+			continue
+		}
+		keys = append(keys, k)
+	}
+	return keys
 }
