@@ -8,7 +8,7 @@ import (
 
 type Application struct {
 	*tview.Application
-	router router.UIRouter
+	router.UIRouter
 }
 
 func NewApplication() *Application {
@@ -18,13 +18,9 @@ func NewApplication() *Application {
 
 func (app *Application) Get(path string, handlers ...router.PageHandler) {
 	if path == "/" || path == "index" {
-		app.router.RegisterIndex(handlers...)
+		app.RegisterIndex(handlers...)
 		return
 	}
 
-	app.router.RegisterPath(path, handlers...)
-}
-
-func (app *Application) UseMiddleware(middleware router.PageHandler) {
-	app.router.UseMiddleware(middleware)
+	app.RegisterPath(path, handlers...)
 }
