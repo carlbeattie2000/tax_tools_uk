@@ -10,7 +10,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-func GetLayout(appRouter *router.UIRouter, _ any) *tview.Flex {
+func GetLayout(appRouter *router.UIRouter, _ any) tview.Primitive {
 	totalProfit := float32(0)
 
 	taxDueDisplay := tview.NewTextView().

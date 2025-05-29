@@ -1,13 +1,13 @@
 package router
 
 type LocationNode struct {
-	location string
+	path     string
 	next     *LocationNode
 	previous *LocationNode
 }
 
 func newLocationNode(location string) *LocationNode {
-	return &LocationNode{location: location}
+	return &LocationNode{path: location}
 }
 
 type Action string
@@ -102,7 +102,7 @@ func (router *Router) forward() {
 	}
 
 	router.location = router.location.next
-	router.listener.update(newRouterUpdate(POP, router.location.location, 1))
+	router.listener.update(newRouterUpdate(POP, router.location.path, 1))
 }
 
 func (router *Router) back() {
@@ -111,11 +111,19 @@ func (router *Router) back() {
 	}
 
 	router.location = router.location.previous
-	router.listener.update(newRouterUpdate(POP, router.location.location, -1))
+	router.listener.update(newRouterUpdate(POP, router.location.path, -1))
 }
 
 func (router *Router) clear() {
 	router.location = nil
 	router.head = nil
 	router.size = 0
+}
+
+func (router *Router) GetCurrentLocation() string {
+	if router.location != nil {
+		return router.location.path
+	}
+
+	return ""
 }

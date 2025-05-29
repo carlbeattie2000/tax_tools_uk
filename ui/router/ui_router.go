@@ -9,18 +9,18 @@ import (
 
 type Route struct {
 	path string
-	page func(router *UIRouter, args any) *tview.Flex
+	page func(router *UIRouter, args any) tview.Primitive
 }
 
-func newRoute(path string, page func(router *UIRouter, args any) *tview.Flex) *Route {
+func newRoute(path string, page func(router *UIRouter, args any) tview.Primitive) *Route {
 	return &Route{path, page}
 }
 
 type UIRouter struct {
 	routerHistory  Router
 	keybindsRouter *KeybindsRouter
-	app            *tview.Application
 	paths          map[string]*Route
+	pages          *tview.Pages
 }
 
 func NewUIRouter(app *tview.Application) *UIRouter {
@@ -28,64 +28,78 @@ func NewUIRouter(app *tview.Application) *UIRouter {
 
 	uiRouter := &UIRouter{
 		routerHistory: *routerHistory,
-		app:           app,
 		paths:         make(map[string]*Route),
+		pages:         tview.NewPages(),
 	}
+
+	app.SetRoot(uiRouter.pages, true).SetFocus(uiRouter.pages)
 
 	uiRouter.keybindsRouter = newKeybindsRouter(app, uiRouter)
 
 	return uiRouter
 }
 
-func (uirouter *UIRouter) RegisterIndex(page func(router *UIRouter, args any) *tview.Flex) {
-	uirouter.paths["index"] = newRoute("index", page)
+func (uirouter *UIRouter) RegisterPath(
+	path string,
+	page func(router *UIRouter, args any) tview.Primitive,
+) {
+	uirouter.paths[path] = newRoute(path, page)
+}
 
+func (uirouter *UIRouter) RegisterIndex(page func(router *UIRouter, args any) tview.Primitive) {
+	uirouter.RegisterPath("index", page)
 	uirouter.Navigate("index", nil)
 }
 
-func (uirouter *UIRouter) RegisterPath(
-	path string,
-	page func(router *UIRouter, args any) *tview.Flex,
-) {
-	uirouter.paths[path] = newRoute(path, page)
+func (uirouter *UIRouter) removeCurrentPage() {
+	currentPath := uirouter.routerHistory.GetCurrentLocation()
+
+	if currentPath != "" {
+		uirouter.pages.RemovePage(currentPath)
+	}
+}
+
+func (uirouter *UIRouter) gotoPage(path string, page tview.Primitive, resize bool) {
+	uirouter.pages.AddAndSwitchToPage(path, page, resize)
 }
 
 func (uirouter *UIRouter) Navigate(path string, args any) {
 	route, ok := uirouter.paths[path]
 
 	if !ok {
-		uirouter.Navigate("not_found", "well, this is awkward")
+		uirouter.Navigate("not_found", nil)
 		return
 	}
 
+	uirouter.removeCurrentPage()
 	uirouter.routerHistory.navigate(path)
-	uirouter.app.SetRoot(route.page(uirouter, args), true)
+	uirouter.gotoPage(route.path, route.page(uirouter, args), true)
 }
 
 func (uirouter *UIRouter) Back() {
+	uirouter.removeCurrentPage()
 	uirouter.routerHistory.back()
-	path := uirouter.routerHistory.location.location
-	route, ok := uirouter.paths[path]
+	route, ok := uirouter.paths[uirouter.routerHistory.GetCurrentLocation()]
 
 	if !ok {
 		uirouter.Navigate("not_found", nil)
 		return
 	}
 
-	uirouter.app.SetRoot(route.page(uirouter, nil), true)
+	uirouter.gotoPage(route.path, route.page(uirouter, nil), true)
 }
 
 func (uirouter *UIRouter) Forward() {
+	uirouter.removeCurrentPage()
 	uirouter.routerHistory.forward()
-	path := uirouter.routerHistory.location.location
-	route, ok := uirouter.paths[path]
+	route, ok := uirouter.paths[uirouter.routerHistory.GetCurrentLocation()]
 
 	if !ok {
 		uirouter.Navigate("not_found", nil)
 		return
 	}
 
-	uirouter.app.SetRoot(route.page(uirouter, nil), true)
+	uirouter.gotoPage(route.path, route.page(uirouter, nil), true)
 }
 
 func (uirouter *UIRouter) ListenerSubscribe(

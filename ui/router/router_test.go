@@ -22,14 +22,14 @@ func TestRouter_trimHead(t *testing.T) {
 			router.trimHead(tt.amount)
 
 			if sizeBefore != 2 || router.size != 1 ||
-				router.location.location != "example_page_2" {
+				router.location.path != "example_page_2" {
 				t.Errorf(
 					"router.trimHead() = size %v, want size %v, size before %v, want size before %v, current page name %v",
 					router.size,
 					1,
 					sizeBefore,
 					2,
-					router.location.location,
+					router.location.path,
 				)
 			}
 		})
@@ -57,10 +57,10 @@ func TestRouter_Navigate(t *testing.T) {
 				router.navigate(page)
 			}
 
-			if router.location.location != tt.wantEndCurrentPage {
+			if router.location.path != tt.wantEndCurrentPage {
 				t.Errorf(
 					"router.Navigate() = currentPage = %v, want %v",
-					router.location.location,
+					router.location.path,
 					tt.wantEndCurrentPage,
 				)
 			}
@@ -101,10 +101,10 @@ func TestRouter_Forward(t *testing.T) {
 				router.forward()
 			}
 
-			if router.location.location != tt.wantPage {
+			if router.location.path != tt.wantPage {
 				t.Errorf(
 					"router.Forward() = currentPage = %v, want %v",
-					router.location.location,
+					router.location.path,
 					tt.wantPage,
 				)
 			}
@@ -138,10 +138,10 @@ func TestRouter_Back(t *testing.T) {
 				router.back()
 			}
 
-			if router.location.location != tt.wantPage {
+			if router.location.path != tt.wantPage {
 				t.Errorf(
 					"router.Forward() = currentPage = %v, want %v",
-					router.location.location,
+					router.location.path,
 					tt.wantPage,
 				)
 			}

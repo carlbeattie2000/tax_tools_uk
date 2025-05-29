@@ -17,7 +17,7 @@ func NiceName(path string) string {
 }
 
 // Route is added last to router, this way we can generate navigation menu from routers routes
-func GetLayout(router *router.UIRouter, _ any) *tview.Flex {
+func GetLayout(router *router.UIRouter, _ any) tview.Primitive {
 	layout := tview.NewFlex()
 
 	menuForm := tview.NewForm()

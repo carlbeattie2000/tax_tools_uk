@@ -6,7 +6,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-func GetLayout(router *router.UIRouter, _ any) *tview.Flex {
+func GetLayout(router *router.UIRouter, _ any) tview.Primitive {
 	layout := tview.NewFlex()
 
 	notFoundForm := tview.NewForm().
