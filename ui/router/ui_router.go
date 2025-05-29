@@ -40,8 +40,12 @@ func nextHandler(path string, args any, handlers []PageHandler) PageRenderer {
 	return next()
 }
 
-func (route *Route) handle(router *UIRouter, args any) tview.Primitive {
-	next := nextHandler(route.path, args, route.handlers)
+func (route *Route) handleMiddleware(
+	router *UIRouter,
+	args any,
+	globalHandlers []PageHandler,
+) tview.Primitive {
+	next := nextHandler(route.path, args, append(globalHandlers, route.handlers...))
 
 	return next(router, args)
 }
@@ -51,6 +55,7 @@ type UIRouter struct {
 	keybindsRouter *KeybindsRouter
 	paths          map[string]*Route
 	pages          *tview.Pages
+	middleware     []PageHandler
 }
 
 func NewUIRouter(app *tview.Application) *UIRouter {
@@ -81,6 +86,10 @@ func (uirouter *UIRouter) RegisterIndex(handlers ...PageHandler) {
 	uirouter.Navigate("index", nil)
 }
 
+func (uirouter *UIRouter) UseMiddleware(handler PageHandler) {
+	uirouter.middleware = append(uirouter.middleware, handler)
+}
+
 func (uirouter *UIRouter) removeCurrentPage() {
 	currentPath := uirouter.routerHistory.GetCurrentLocation()
 
@@ -103,7 +112,7 @@ func (uirouter *UIRouter) Navigate(path string, args any) {
 
 	uirouter.removeCurrentPage()
 	uirouter.routerHistory.navigate(path)
-	renderer := route.handle(uirouter, args)
+	renderer := route.handleMiddleware(uirouter, args, uirouter.middleware)
 	uirouter.gotoPage(route.path, renderer, true)
 }
 
@@ -117,7 +126,7 @@ func (uirouter *UIRouter) Back() {
 		return
 	}
 
-	renderer := route.handle(uirouter, nil)
+	renderer := route.handleMiddleware(uirouter, nil, uirouter.middleware)
 	uirouter.gotoPage(route.path, renderer, true)
 }
 
@@ -131,7 +140,7 @@ func (uirouter *UIRouter) Forward() {
 		return
 	}
 
-	renderer := route.handle(uirouter, nil)
+	renderer := route.handleMiddleware(uirouter, nil, uirouter.middleware)
 	uirouter.gotoPage(route.path, renderer, true)
 }
 

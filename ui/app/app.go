@@ -24,3 +24,7 @@ func (app *Application) Get(path string, handlers ...router.PageHandler) {
 
 	app.router.RegisterPath(path, handlers...)
 }
+
+func (app *Application) UseMiddleware(middleware router.PageHandler) {
+	app.router.UseMiddleware(middleware)
+}
