@@ -5,6 +5,7 @@ import (
 	"github.com/rivo/tview"
 )
 
+// TODO: Support new routing features like middleware
 type KeybindsRouter struct {
 	app      *tview.Application
 	router   *UIRouter

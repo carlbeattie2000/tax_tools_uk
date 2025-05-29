@@ -7,13 +7,43 @@ import (
 	"github.com/rivo/tview"
 )
 
+// TODO: Global middleware
+type (
+	PageRenderer func(router *UIRouter, args any) tview.Primitive
+	PageHandler  func(path string, args any, next func() PageRenderer) PageRenderer
+)
+
 type Route struct {
-	path string
-	page func(router *UIRouter, args any) tview.Primitive
+	path     string
+	handlers []PageHandler
 }
 
-func newRoute(path string, page func(router *UIRouter, args any) tview.Primitive) *Route {
-	return &Route{path, page}
+func newRoute(path string, handlers []PageHandler) *Route {
+	return &Route{path, handlers}
+}
+
+func nextHandler(path string, args any, handlers []PageHandler) PageRenderer {
+	index := 0
+
+	var next func() PageRenderer
+	next = func() PageRenderer {
+		if index >= len(handlers) {
+			return func(_ *UIRouter, _ any) tview.Primitive {
+				return nil
+			}
+		}
+		handler := handlers[index]
+		index++
+		return handler(path, args, next)
+	}
+
+	return next()
+}
+
+func (route *Route) handle(router *UIRouter, args any) tview.Primitive {
+	next := nextHandler(route.path, args, route.handlers)
+
+	return next(router, args)
 }
 
 type UIRouter struct {
@@ -41,13 +71,13 @@ func NewUIRouter(app *tview.Application) *UIRouter {
 
 func (uirouter *UIRouter) RegisterPath(
 	path string,
-	page func(router *UIRouter, args any) tview.Primitive,
+	handlers ...PageHandler,
 ) {
-	uirouter.paths[path] = newRoute(path, page)
+	uirouter.paths[path] = newRoute(path, handlers)
 }
 
-func (uirouter *UIRouter) RegisterIndex(page func(router *UIRouter, args any) tview.Primitive) {
-	uirouter.RegisterPath("index", page)
+func (uirouter *UIRouter) RegisterIndex(handlers ...PageHandler) {
+	uirouter.RegisterPath("index", handlers...)
 	uirouter.Navigate("index", nil)
 }
 
@@ -73,7 +103,8 @@ func (uirouter *UIRouter) Navigate(path string, args any) {
 
 	uirouter.removeCurrentPage()
 	uirouter.routerHistory.navigate(path)
-	uirouter.gotoPage(route.path, route.page(uirouter, args), true)
+	renderer := route.handle(uirouter, args)
+	uirouter.gotoPage(route.path, renderer, true)
 }
 
 func (uirouter *UIRouter) Back() {
@@ -86,7 +117,8 @@ func (uirouter *UIRouter) Back() {
 		return
 	}
 
-	uirouter.gotoPage(route.path, route.page(uirouter, nil), true)
+	renderer := route.handle(uirouter, nil)
+	uirouter.gotoPage(route.path, renderer, true)
 }
 
 func (uirouter *UIRouter) Forward() {
@@ -99,7 +131,8 @@ func (uirouter *UIRouter) Forward() {
 		return
 	}
 
-	uirouter.gotoPage(route.path, route.page(uirouter, nil), true)
+	renderer := route.handle(uirouter, nil)
+	uirouter.gotoPage(route.path, renderer, true)
 }
 
 func (uirouter *UIRouter) ListenerSubscribe(

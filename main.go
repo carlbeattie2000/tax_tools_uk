@@ -2,12 +2,11 @@ package main
 
 import (
 	"net/http"
+	"tax_calculator/engine/ui/app"
 	mainmenu "tax_calculator/engine/ui/main_menu"
 	notfound "tax_calculator/engine/ui/not_found"
 	"tax_calculator/engine/ui/router"
 	taxcalculator "tax_calculator/engine/ui/tax_calculator"
-
-	"github.com/rivo/tview"
 
 	_ "net/http/pprof"
 )
@@ -17,13 +16,23 @@ func main() {
 		http.ListenAndServe("localhost:6060", nil)
 	}()
 
-	app := tview.NewApplication()
-	router := router.NewUIRouter(app)
+	app := app.NewApplication()
 
-	router.RegisterPath("tax_calculator", taxcalculator.GetLayout)
-	router.RegisterPath("not_found", notfound.GetLayout)
-
-	router.RegisterIndex(mainmenu.GetLayout)
+	app.Get(
+		"tax_calculator",
+		func(_ string, _ any, _ func() router.PageRenderer) router.PageRenderer {
+			return taxcalculator.GetLayout
+		},
+	)
+	app.Get(
+		"not_found",
+		func(_ string, _ any, _ func() router.PageRenderer) router.PageRenderer {
+			return notfound.GetLayout
+		},
+	)
+	app.Get("/", func(_ string, _ any, _ func() router.PageRenderer) router.PageRenderer {
+		return mainmenu.GetLayout
+	})
 
 	app.Run()
 }
