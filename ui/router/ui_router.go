@@ -7,7 +7,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-// TODO: Global middleware
+// TODO: Path based routing like servers.. eg. x/y/z
 type (
 	PageRenderer func(router *UIRouter, args any) tview.Primitive
 	PageHandler  func(path string, args any, next func() PageRenderer) PageRenderer
@@ -89,6 +89,12 @@ func (uirouter *UIRouter) Get(path string, handlers ...PageHandler) {
 
 func (uirouter *UIRouter) UseMiddleware(handler PageHandler) {
 	uirouter.middleware = append(uirouter.middleware, handler)
+}
+
+func (uirouter *UIRouter) UseRouter(router *UIRouter) {
+	for k, v := range router.paths {
+		uirouter.Get(k, v.handlers...)
+	}
 }
 
 func (uirouter *UIRouter) removeCurrentPage() {
