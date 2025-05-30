@@ -74,16 +74,17 @@ func NewUIRouter(app *tview.Application) *UIRouter {
 	return uiRouter
 }
 
-func (uirouter *UIRouter) RegisterPath(
-	path string,
-	handlers ...PageHandler,
-) {
-	uirouter.paths[path] = newRoute(path, handlers)
-}
+func (uirouter *UIRouter) Get(path string, handlers ...PageHandler) {
+	isIndex := path == "/" || path == "index"
 
-func (uirouter *UIRouter) RegisterIndex(handlers ...PageHandler) {
-	uirouter.RegisterPath("index", handlers...)
-	uirouter.Navigate("index", nil)
+	if isIndex {
+		path = "index"
+		uirouter.paths[path] = newRoute(path, handlers)
+		uirouter.Navigate(path, nil)
+		return
+	}
+
+	uirouter.paths[path] = newRoute(path, handlers)
 }
 
 func (uirouter *UIRouter) UseMiddleware(handler PageHandler) {
