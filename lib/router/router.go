@@ -240,12 +240,14 @@ func (router *Router) UseErrorHandler(handlers ...ErrorFunc) {
 	}
 }
 
-func (router *Router) Use(req *Request) {
+func (router *Router) Use(req *Request) *Response {
 	res := newResponse(router)
 	requestContext := newRequestContext(req)
 	router.history.navigate(requestContext)
 
 	router.handle(req, res)
+
+	return res
 }
 
 func (router *Router) Back() {
