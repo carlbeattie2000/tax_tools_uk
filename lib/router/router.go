@@ -223,7 +223,15 @@ func (router *Router) UseRouter(newRouter *Router) {
 	}
 }
 
-func (router *Router) UseNamedRouter(path string, newRouter *Router) {}
+func (router *Router) UseNamedRouter(path string, newRouter *Router) {
+	for _, layer := range newRouter.stack {
+		layer.path = path + layer.path
+		if layer.route != nil {
+			layer.route.path = path + layer.route.path
+		}
+		router.stack = append(router.stack, layer)
+	}
+}
 
 func (router *Router) UseErrorHandler(handlers ...ErrorFunc) {
 	for _, handler := range handlers {
@@ -255,14 +263,4 @@ func (router *Router) Forward() {
 
 func (router *Router) CurrentHistoryLocationContext() *RequestContext {
 	return router.history.location.context
-}
-
-func (router *Router) GetPaths() []string {
-	var paths []string
-	for _, layer := range router.stack {
-		if layer.route != nil && layer.route.path != "/" {
-			paths = append(paths, layer.route.path)
-		}
-	}
-	return paths
 }

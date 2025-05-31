@@ -19,7 +19,7 @@ func main() {
 	app := app.NewApplication()
 	viewRouter := viewrouter.ViewRouter(app)
 
-	app.UseRouter(viewRouter)
+	app.UseNamedRouter("/views", viewRouter)
 
 	app.UseMiddleware(func(req *router.Request, res *router.Response, next router.NextFunc) {
 		res.Render(notfound.GetLayout(app))

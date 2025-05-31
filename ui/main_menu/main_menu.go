@@ -24,11 +24,9 @@ func GetLayout(app *app.Application) tview.Primitive {
 
 	menuForm := tview.NewForm()
 
-	for _, path := range app.GetPaths() {
-		menuForm.AddButton(NiceName(path), func() {
-			app.Fetch(path, nil, "")
-		})
-	}
+	menuForm.AddButton("Tax Calculator", func() {
+		app.Fetch("/views/tax_calculator", nil, "")
+	})
 
 	layout.AddItem(menuForm, 0, 1, true)
 

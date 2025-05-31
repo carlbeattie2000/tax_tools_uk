@@ -12,7 +12,7 @@ func GetLayout(app *app.Application) tview.Primitive {
 	notFoundForm := tview.NewForm().
 		AddTextView("Error", "Page Not Found", 20, 2, true, false).
 		AddButton("home", func() {
-			app.Fetch("/", nil, "")
+			app.Fetch("/views/", nil, "")
 		})
 	layout.AddItem(notFoundForm, 0, 1, true)
 

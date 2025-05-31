@@ -26,7 +26,7 @@ func (app *Application) Fetch(path string, params map[string]string, query strin
 }
 
 func (app *Application) Start() {
-	app.Fetch("/", nil, "")
+	app.Fetch("/views/", nil, "")
 	app.Run()
 }
 
