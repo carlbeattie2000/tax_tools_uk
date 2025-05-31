@@ -31,10 +31,11 @@ func (rc *RequestContext) SetView(page tview.Primitive) {
 
 type Response struct {
 	*Router
+	status int
 }
 
 func newResponse(router *Router) *Response {
-	return &Response{router}
+	return &Response{router, 200}
 }
 
 func (res *Response) Render(page tview.Primitive) {
