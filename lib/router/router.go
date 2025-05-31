@@ -197,31 +197,33 @@ func (router *Router) Route(path string) *Route {
 	return route
 }
 
-func (router *Router) Get(path string, handlers ...RequestHandlerFunc) *Route {
+func (router *Router) Get(path string, handlers ...RequestHandlerFunc) *Router {
 	route := newRoute(path)
 	route.Get(handlers...)
 	layer := NewRouteLayer(path, []string{})
 	layer.route = route
 	router.stack = append(router.stack, layer)
-	return route
+	return router
 }
 
-func (router *Router) UseMiddleware(handlers ...RequestHandlerFunc) {
+func (router *Router) UseMiddleware(handlers ...RequestHandlerFunc) *Router {
 	for _, handler := range handlers {
 		layer := NewMiddlewareLayer("*", nil, handler)
 		router.stack = append(router.stack, layer)
 	}
+	return router
 }
 
 func (router *Router) UseNamedMiddleware(path string, handlers ...RequestHandlerFunc) {}
 
-func (router *Router) UseRouter(newRouter *Router) {
+func (router *Router) UseRouter(newRouter *Router) *Router {
 	for _, layer := range newRouter.stack {
 		router.stack = append(router.stack, layer)
 	}
+	return router
 }
 
-func (router *Router) UseNamedRouter(path string, newRouter *Router) {
+func (router *Router) UseNamedRouter(path string, newRouter *Router) *Router {
 	for _, layer := range newRouter.stack {
 		layer.path = path + layer.path
 		if layer.route != nil {
@@ -229,6 +231,7 @@ func (router *Router) UseNamedRouter(path string, newRouter *Router) {
 		}
 		router.stack = append(router.stack, layer)
 	}
+	return router
 }
 
 func (router *Router) UseErrorHandler(handlers ...ErrorFunc) {
