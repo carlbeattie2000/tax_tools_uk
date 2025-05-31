@@ -2,11 +2,11 @@ package main
 
 import (
 	"net/http"
+	"tax_calculator/engine/internal/logger"
+	"tax_calculator/engine/lib/router"
 	"tax_calculator/engine/ui/app"
-	mainmenu "tax_calculator/engine/ui/main_menu"
 	notfound "tax_calculator/engine/ui/not_found"
-	"tax_calculator/engine/ui/router"
-	taxcalculator "tax_calculator/engine/ui/tax_calculator"
+	viewrouter "tax_calculator/engine/ui/view_router"
 
 	_ "net/http/pprof"
 )
@@ -17,22 +17,19 @@ func main() {
 	}()
 
 	app := app.NewApplication()
+	viewRouter := viewrouter.ViewRouter(app)
 
-	app.Get(
-		"tax_calculator",
-		func(_ string, _ any, _ func() router.PageRenderer) router.PageRenderer {
-			return taxcalculator.GetLayout
-		},
-	)
-	app.Get(
-		"not_found",
-		func(_ string, _ any, _ func() router.PageRenderer) router.PageRenderer {
-			return notfound.GetLayout
-		},
-	)
-	app.Get("/", func(_ string, _ any, _ func() router.PageRenderer) router.PageRenderer {
-		return mainmenu.GetLayout
+	app.UseRouter(viewRouter)
+
+	app.UseMiddleware(func(req *router.Request, res *router.Response, next router.NextFunc) {
+		res.Render(notfound.GetLayout(app))
 	})
 
-	app.Run()
+	app.UseErrorHandler(
+		func(err error, req *router.Request, res *router.Response, next router.NextFunc) {
+			logger.GetLogger().Println(err)
+		},
+	)
+
+	app.Start()
 }

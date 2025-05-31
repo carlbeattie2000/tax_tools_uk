@@ -5,12 +5,12 @@ import (
 	"strconv"
 	nationalinsurance "tax_calculator/engine/internal/valueobjects/hmrc_valueobjects/national_insurance"
 	taxliability "tax_calculator/engine/internal/valueobjects/hmrc_valueobjects/tax_liability"
-	"tax_calculator/engine/ui/router"
+	"tax_calculator/engine/ui/app"
 
 	"github.com/rivo/tview"
 )
 
-func GetLayout(appRouter *router.UIRouter, _ any) tview.Primitive {
+func GetLayout(app *app.Application) tview.Primitive {
 	totalProfit := float32(0)
 
 	taxDueDisplay := tview.NewTextView().
@@ -46,7 +46,7 @@ func GetLayout(appRouter *router.UIRouter, _ any) tview.Primitive {
 	}).SetFieldBackgroundColor(000).SetButtonBackgroundColor(000)
 
 	form.AddButton("back", func() {
-		appRouter.Back()
+		app.Back()
 	})
 
 	layout := tview.NewFlex().
