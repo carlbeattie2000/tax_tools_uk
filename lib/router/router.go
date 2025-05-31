@@ -1,8 +1,6 @@
 package router
 
 import (
-	"errors"
-
 	"github.com/rivo/tview"
 )
 
@@ -146,7 +144,7 @@ func (router *Router) handle(req *Request, res *Response) {
 		}
 
 		if sync++; sync > 100 {
-			next(errors.New("sync exceeded"))
+			go next(err)
 			return
 		}
 
@@ -179,13 +177,13 @@ func (router *Router) handle(req *Request, res *Response) {
 			return
 		}
 
+		sync = 0
+
 		if layerError != nil {
 			layer.HandleError(layerError, req, res, next)
 		} else {
 			layer.HandleRequest(req, res, next)
 		}
-
-		sync = 0
 	}
 
 	next(nil)
