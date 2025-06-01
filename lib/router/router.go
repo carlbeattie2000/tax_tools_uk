@@ -281,7 +281,7 @@ func (router *Router) register404Handler() {
 
 	var found404Layer *Layer
 
-	for i := len(router.stack); i >= 0; i-- {
+	for i := len(router.stack) - 1; i >= 0; i-- {
 		if router.stack[i].route != nil {
 			break
 		}
