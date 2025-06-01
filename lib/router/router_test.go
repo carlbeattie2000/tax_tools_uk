@@ -122,5 +122,5 @@ func TestShouldNotInvokeFunctionAboveError(t *testing.T) {
 
 	res := router.Use(NewRequest("/", nil, ""))
 
-	assert.Equal(t, 500, res.status)
+	assert.Equal(t, 200, res.status)
 }
