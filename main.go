@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 	"tax_calculator/engine/internal/logger"
+	"tax_calculator/engine/lib/app"
 	"tax_calculator/engine/lib/router"
-	"tax_calculator/engine/ui/app"
 	notfound "tax_calculator/engine/ui/not_found"
 	viewrouter "tax_calculator/engine/ui/view_router"
 
@@ -21,15 +21,15 @@ func main() {
 
 	app.UseNamedRouter("/views", viewRouter)
 
-	app.UseMiddleware(func(req *router.Request, res *router.Response, next router.NextFunc) {
+	app.Middleware(func(req *router.Request, res *router.Response, next router.NextFunc) {
 		res.Render(notfound.GetLayout(app))
 	})
 
-	app.UseErrorHandler(
+	app.ErrorHandler(
 		func(err error, req *router.Request, res *router.Response, next router.NextFunc) {
 			logger.GetLogger().Println(err)
 		},
 	)
 
-	app.Start()
+	app.RunWithInitialPath("/views/")
 }

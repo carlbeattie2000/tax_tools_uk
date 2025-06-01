@@ -1,7 +1,7 @@
 package notfound
 
 import (
-	"tax_calculator/engine/ui/app"
+	"tax_calculator/engine/lib/app"
 
 	"github.com/rivo/tview"
 )
