@@ -4,22 +4,28 @@ import (
 	"tax_calculator/engine/lib/router"
 	"time"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
 type Application struct {
-	tui     *tview.Application
-	router  *router.Router
-	pages   *tview.Pages
-	history *History
+	tui      *tview.Application
+	router   *router.Router
+	pages    *tview.Pages
+	history  *History
+	keybinds *Keybinds
 }
 
 func NewApplication() *Application {
 	tui := tview.NewApplication()
 	pages := tview.NewPages()
 	tui.SetRoot(pages, true).SetFocus(pages)
-
-	return &Application{tui, router.NewRouter(), pages, newHistory(15)}
+	router := router.NewRouter()
+	history := newHistory(15)
+	app := &Application{tui, router, pages, history, nil}
+	keybinds := newKeybinds(app)
+	app.keybinds = keybinds
+	return app
 }
 
 func (app *Application) setPage(page tview.Primitive) {
@@ -128,27 +134,6 @@ func (app *Application) Forward() {
 	}
 }
 
-// // TODO: Support new routing features like middleware
-// type KeybindsRouter struct {
-// 	app      *Application
-// 	keybinds map[tcell.Key]string
-// }
-//
-// func newKeybindsRouter(app *Application) *KeybindsRouter {
-// 	kr := KeybindsRouter{app, map[tcell.Key]string{}}
-//
-// 	kr.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-// 		if location, ok := kr.keybinds[event.Key()]; ok {
-// 			kr.app.Fetch(location, nil, "")
-// 			return nil
-// 		}
-//
-// 		return event
-// 	})
-//
-// 	return &kr
-// }
-//
-// func (keyboardrouter *KeybindsRouter) RegisterKey(key tcell.Key, location string) {
-// 	keyboardrouter.keybinds[key] = location
-// }
+func (app *Application) RegisterKeybind(key tcell.Key, handler KeybindHandler) {
+	app.keybinds.registerKey(key, handler)
+}
