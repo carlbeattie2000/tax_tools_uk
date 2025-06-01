@@ -46,7 +46,7 @@ func GetLayout(app *app.Application) tview.Primitive {
 	}).SetFieldBackgroundColor(000).SetButtonBackgroundColor(000)
 
 	form.AddButton("back", func() {
-		// app.Back()
+		app.Back()
 	})
 
 	layout := tview.NewFlex().

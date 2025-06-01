@@ -14,7 +14,7 @@ func TestAppHasDefault404Handler(t *testing.T) {
 	done := make(chan struct{})
 
 	go func() {
-		app.Start()
+		app.Run()
 		close(done)
 	}()
 
@@ -22,7 +22,7 @@ func TestAppHasDefault404Handler(t *testing.T) {
 
 	res := app.Fetch("/", nil, "")
 
-	app.QueueUpdate(func() {
+	app.tui.QueueUpdate(func() {
 		app.Stop()
 	})
 
@@ -44,7 +44,7 @@ func TestAppHasDefaultErrorHandler(t *testing.T) {
 			next(errors.New("oh a error"))
 		})
 
-		app.Start()
+		app.Run()
 		close(done)
 	}()
 
@@ -52,7 +52,7 @@ func TestAppHasDefaultErrorHandler(t *testing.T) {
 
 	res := app.Fetch("/", nil, "")
 
-	app.QueueUpdate(func() {
+	app.tui.QueueUpdate(func() {
 		app.Stop()
 	})
 

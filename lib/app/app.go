@@ -8,13 +8,23 @@ import (
 )
 
 type Application struct {
-	tui    *tview.Application
-	router *router.Router
+	tui     *tview.Application
+	router  *router.Router
+	pages   *tview.Pages
+	history *History
 }
 
 func NewApplication() *Application {
 	tui := tview.NewApplication()
-	return &Application{tui, router.NewRouter(tui)}
+	pages := tview.NewPages()
+	tui.SetRoot(pages, true).SetFocus(pages)
+
+	return &Application{tui, router.NewRouter(), pages, newHistory(15)}
+}
+
+func (app *Application) setPage(page tview.Primitive) {
+	app.pages.RemovePage("view")
+	app.pages.AddAndSwitchToPage("view", page, true)
 }
 
 func (app *Application) Get(path string, handlers ...router.RequestHandlerFunc) *Application {
@@ -37,7 +47,7 @@ func (app *Application) Route(path string) *router.Route {
 }
 
 func (app *Application) NewRouter() *router.Router {
-	return router.NewRouter(nil)
+	return router.NewRouter()
 }
 
 func (app *Application) UseRouter(router *router.Router) *Application {
@@ -55,13 +65,29 @@ func (app *Application) Fetch(
 	params map[string]string,
 	query string,
 ) *router.Response {
-	return app.router.Use(router.NewRequest(path, params, query))
+	res := app.router.Use(router.NewRequest(path, params, query))
+
+	app.history.navigate(newPageContext(path, res))
+
+	if res.Status >= 200 && res.Status < 300 && res.View != nil {
+		app.setPage(res.View)
+		return res
+	}
+
+	if res.Redirect != "" {
+		app.Fetch(res.Redirect, nil, "")
+		return res
+	}
+
+	return res
 }
 
 func (app *Application) Run() {
 	app.router.RegisterDefaultHandlers()
 	err := app.tui.Run()
-	panic(err)
+	if err != nil {
+		panic(app)
+	}
 }
 
 func (app *Application) RunWithInitialPath(path string) {
@@ -74,6 +100,32 @@ func (app *Application) RunWithInitialPath(path string) {
 	}()
 	err := app.tui.Run()
 	panic(err)
+}
+
+func (app *Application) Stop() {
+	app.tui.Stop()
+}
+
+func (app *Application) Back() {
+	app.history.back()
+	ctx := app.history.location.context
+	if ctx == nil {
+		return
+	}
+	if ctx.response.View != nil {
+		app.setPage(ctx.response.View)
+	}
+}
+
+func (app *Application) Forward() {
+	app.history.forward()
+	ctx := app.history.location.context
+	if ctx == nil {
+		return
+	}
+	if ctx.response.View != nil {
+		app.setPage(ctx.response.View)
+	}
 }
 
 // // TODO: Support new routing features like middleware

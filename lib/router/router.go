@@ -2,119 +2,14 @@ package router
 
 import (
 	"tax_calculator/engine/internal/logger"
-
-	"github.com/rivo/tview"
 )
-
-type RouterHistoryAction string
-
-const (
-	POP  RouterHistoryAction = "POP"
-	PUSH RouterHistoryAction = "PUSH"
-)
-
-type RouterHistoryNode struct {
-	context  *RequestContext
-	previous *RouterHistoryNode
-	next     *RouterHistoryNode
-}
-
-func newRouterHistoryNode(ctx *RequestContext) *RouterHistoryNode {
-	return &RouterHistoryNode{context: ctx}
-}
-
-// RouterHistory represents the routers history
-type RouterHistory struct {
-	head     *RouterHistoryNode
-	location *RouterHistoryNode
-	size     int
-	maxSize  int
-}
-
-func newHistoryRouter(maxSize int) *RouterHistory {
-	return &RouterHistory{maxSize: maxSize}
-}
-
-func (rh *RouterHistory) trimHead(delta int) {
-	if delta <= 0 {
-		return
-	}
-	if rh.size == 1 {
-		rh.head = nil
-		rh.location = nil
-		rh.size = 0
-
-		return
-	}
-	for rh.head != nil && delta > 0 {
-		rh.head = rh.head.next
-		rh.head.previous = nil
-		rh.size--
-		delta--
-	}
-}
-
-func (rh *RouterHistory) nodeLengthToEndFromNode(node *RouterHistoryNode) int {
-	var count int
-	for node.next != nil {
-		count++
-		node = node.next
-	}
-	return count
-}
-
-func (rh *RouterHistory) addNode(node *RouterHistoryNode) {
-	newSize := rh.size + 1
-	if newSize > rh.maxSize {
-		rh.trimHead(1)
-	}
-
-	if rh.head == nil {
-		rh.head = node
-		rh.location = node
-	} else {
-		sizeToRemove := rh.nodeLengthToEndFromNode(rh.location)
-		rh.size -= sizeToRemove
-		node.previous = rh.location
-		rh.location.next = node
-		rh.location = node
-	}
-
-	rh.size++
-}
-
-func (rh *RouterHistory) navigate(ctx *RequestContext) {
-	historyNode := newRouterHistoryNode(ctx)
-	rh.addNode(historyNode)
-}
-
-func (rh *RouterHistory) forward() {
-	if rh.head == nil || rh.location.next == nil {
-		return
-	}
-
-	rh.location = rh.location.next
-}
-
-func (rh *RouterHistory) back() {
-	if rh.head == nil || rh.location.previous == nil {
-		return
-	}
-
-	rh.location = rh.location.previous
-}
 
 type Router struct {
-	history *RouterHistory
-	pages   *tview.Pages
-	stack   LayerStack
+	stack LayerStack
 }
 
-func NewRouter(app *tview.Application) *Router {
-	r := &Router{history: newHistoryRouter(20), pages: tview.NewPages(), stack: LayerStack{}}
-	if app != nil {
-		app.SetRoot(r.pages, true).SetFocus(r.pages)
-	}
+func NewRouter() *Router {
+	r := &Router{LayerStack{}}
 	return r
 }
 
@@ -242,31 +137,11 @@ func (router *Router) UseErrorHandler(handlers ...ErrorFunc) {
 }
 
 func (router *Router) Use(req *Request) *Response {
-	res := newResponse(router)
-	requestContext := newRequestContext(req)
-	router.history.navigate(requestContext)
+	res := NewResponse()
 
 	router.handle(req, res)
 
 	return res
-}
-
-func (router *Router) Back() {
-	router.history.back()
-	req := router.CurrentHistoryLocationContext().Request
-	res := newResponse(router)
-	router.handle(req, res)
-}
-
-func (router *Router) Forward() {
-	router.history.forward()
-	req := router.CurrentHistoryLocationContext().Request
-	res := newResponse(router)
-	router.handle(req, res)
-}
-
-func (router *Router) CurrentHistoryLocationContext() *RequestContext {
-	return router.history.location.context
 }
 
 func handle404(req *Request, res *Response, next NextFunc) {
