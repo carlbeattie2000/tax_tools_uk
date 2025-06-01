@@ -26,7 +26,7 @@ func TestRouterShouldNotStackOverflowWithManyRegisteredRoutes(t *testing.T) {
 	req := NewRequest("/", nil, "")
 	res := router.Use(req)
 
-	assert.Equal(t, 200, res.status)
+	assert.Equal(t, 200, res.Status)
 }
 
 func TestRouterShouldNotStackOverflowWithLargeSyncStack(t *testing.T) {
@@ -41,7 +41,7 @@ func TestRouterShouldNotStackOverflowWithLargeSyncStack(t *testing.T) {
 	req := NewRequest("/sync_stack", nil, "")
 	res := router.Use(req)
 
-	assert.Equal(t, 200, res.status)
+	assert.Equal(t, 200, res.Status)
 	assert.NotNil(t, res.CurrentHistoryLocationContext().view)
 }
 
@@ -64,7 +64,7 @@ func TestShouldSupportAnotherRouter(t *testing.T) {
 
 	res := router.Use(NewRequest("/", nil, ""))
 
-	assert.Equal(t, 200, res.status)
+	assert.Equal(t, 200, res.Status)
 	assert.NotNil(t, res.CurrentHistoryLocationContext().view)
 }
 
@@ -75,7 +75,7 @@ func TestShouldAcceptMultipleArguments(t *testing.T) {
 
 	res := router.Use(NewRequest("/", nil, ""))
 
-	assert.Equal(t, 200, res.status)
+	assert.Equal(t, 200, res.Status)
 	assert.NotNil(t, res.CurrentHistoryLocationContext().view)
 }
 
@@ -90,7 +90,7 @@ func TestShouldNotInvokeSingleErrorFunction(t *testing.T) {
 
 	// Since this is not a full HTTP server, and the router here doesn't integrate with
 	// an HTTP library that would send a 404 by default, the response status remains 200.
-	assert.Equal(t, 200, res.status)
+	assert.Equal(t, 200, res.Status)
 }
 
 func TestShouldInvokeSingleErrorFunction(t *testing.T) {
@@ -101,19 +101,19 @@ func TestShouldInvokeSingleErrorFunction(t *testing.T) {
 	})
 
 	router.UseErrorHandler(func(err error, req *Request, res *Response, next NextFunc) {
-		res.status = 500
+		res.Status = 500
 	})
 
 	res := router.Use(NewRequest("/", nil, ""))
 
-	assert.Equal(t, 500, res.status)
+	assert.Equal(t, 500, res.Status)
 }
 
 func TestShouldNotInvokeFunctionAboveError(t *testing.T) {
 	router := NewRouter(nil)
 
 	router.UseErrorHandler(func(err error, req *Request, res *Response, next NextFunc) {
-		res.status = 500
+		res.Status = 500
 	})
 
 	router.UseMiddleware(func(req *Request, res *Response, next NextFunc) {
@@ -122,5 +122,5 @@ func TestShouldNotInvokeFunctionAboveError(t *testing.T) {
 
 	res := router.Use(NewRequest("/", nil, ""))
 
-	assert.Equal(t, 200, res.status)
+	assert.Equal(t, 200, res.Status)
 }

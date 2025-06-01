@@ -270,7 +270,7 @@ func (router *Router) CurrentHistoryLocationContext() *RequestContext {
 }
 
 func handle404(req *Request, res *Response, next NextFunc) {
-	res.status = 404
+	res.Status = 404
 }
 
 func (router *Router) register404Handler() {
@@ -298,9 +298,9 @@ func (router *Router) register404Handler() {
 }
 
 func handleError(err error, req *Request, res *Response, next NextFunc) {
-	res.status = 500
+	res.Status = 500
 
-	logger.GetLogger().Println(err, res.status)
+	logger.GetLogger().Println(err, res.Status)
 }
 
 func (router *Router) registerErrorHandler() {
