@@ -31,7 +31,7 @@ func (rc *RequestContext) SetView(page tview.Primitive) {
 
 type Response struct {
 	*Router
-	status int
+	Status int
 }
 
 func newResponse(router *Router) *Response {
