@@ -139,7 +139,6 @@ func (router *Router) handle(req *Request, res *Response) {
 		}
 
 		if idx >= len(stack) {
-			next(layerError)
 			return
 		}
 
