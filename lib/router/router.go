@@ -1,6 +1,8 @@
 package router
 
 import (
+	"tax_calculator/engine/internal/logger"
+
 	"github.com/rivo/tview"
 )
 
@@ -265,4 +267,56 @@ func (router *Router) Forward() {
 
 func (router *Router) CurrentHistoryLocationContext() *RequestContext {
 	return router.history.location.context
+}
+
+func handle404(req *Request, res *Response, next NextFunc) {
+	res.status = 404
+}
+
+func (router *Router) register404Handler() {
+	if len(router.stack) == 0 {
+		router.UseMiddleware(handle404)
+		return
+	}
+
+	var found404Layer *Layer
+
+	for i := len(router.stack); i >= 0; i-- {
+		if router.stack[i].route != nil {
+			break
+		}
+
+		if router.stack[i].middlewareHandler != nil {
+			found404Layer = router.stack[i]
+			break
+		}
+	}
+
+	if found404Layer == nil {
+		router.UseMiddleware(handle404)
+	}
+}
+
+func handleError(err error, req *Request, res *Response, next NextFunc) {
+	res.status = 500
+
+	logger.GetLogger().Println(err, res.status)
+}
+
+func (router *Router) registerErrorHandler() {
+	if len(router.stack) == 0 {
+		router.UseErrorHandler(handleError)
+		return
+	}
+
+	lastLayer := router.stack[len(router.stack)-1]
+
+	if lastLayer.errorHandler == nil {
+		router.UseErrorHandler(handleError)
+	}
+}
+
+func (router *Router) RegisterDefaultHandlers() {
+	router.register404Handler()
+	router.registerErrorHandler()
 }

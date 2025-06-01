@@ -26,6 +26,7 @@ func (app *Application) Fetch(path string, params map[string]string, query strin
 }
 
 func (app *Application) Start() {
+	app.Router.RegisterDefaultHandlers()
 	app.Fetch("/views/", nil, "")
 	app.Run()
 }
