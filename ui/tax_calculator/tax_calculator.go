@@ -45,10 +45,6 @@ func GetLayout(app *app.Application) tview.Primitive {
 		totalDueDisplay.SetText(fmt.Sprintf("£%.2f", taxDue+nationalInsuranceDue))
 	}).SetFieldBackgroundColor(000).SetButtonBackgroundColor(000)
 
-	form.AddButton("back", func() {
-		app.Back()
-	})
-
 	layout := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(form, 0, 1, true).

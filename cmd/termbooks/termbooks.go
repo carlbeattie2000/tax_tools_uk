@@ -9,6 +9,8 @@ import (
 	viewrouter "tax_calculator/engine/ui/view_router"
 
 	_ "net/http/pprof"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 func main() {
@@ -16,20 +18,27 @@ func main() {
 		http.ListenAndServe("localhost:6060", nil)
 	}()
 
-	app := app.NewApplication()
-	viewRouter := viewrouter.ViewRouter(app)
+	tuiApp := app.NewApplication()
+	viewRouter := viewrouter.ViewRouter(tuiApp)
 
-	app.UseNamedRouter("/views", viewRouter)
+	tuiApp.UseNamedRouter("/views", viewRouter)
 
-	app.Middleware(func(req *router.Request, res *router.Response, next router.NextFunc) {
-		res.Render(notfound.GetLayout(app))
+	tuiApp.Middleware(func(req *router.Request, res *router.Response, next router.NextFunc) {
+		res.Render(notfound.GetLayout(tuiApp))
 	})
 
-	app.ErrorHandler(
+	tuiApp.ErrorHandler(
 		func(err error, req *router.Request, res *router.Response, next router.NextFunc) {
 			logger.GetLogger().Println(err)
 		},
 	)
 
-	app.RunWithInitialPath("/views/")
+	tuiApp.RegisterKeybind(tcell.KeyF1, func(app *app.Application) {
+		app.Back()
+	})
+	tuiApp.RegisterKeybind(tcell.KeyF2, func(app *app.Application) {
+		app.Forward()
+	})
+
+	tuiApp.RunWithInitialPath("/views/")
 }
